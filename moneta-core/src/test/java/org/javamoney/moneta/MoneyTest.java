@@ -19,6 +19,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -30,15 +31,9 @@ import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Locale;
 
 import javax.money.*;
-import javax.money.format.AmountFormatQueryBuilder;
-import javax.money.format.MonetaryAmountFormat;
-import javax.money.format.MonetaryFormats;
 
-import org.javamoney.moneta.format.CurrencyStyle;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -450,7 +445,7 @@ public class MoneyTest {
                 MonetaryContextBuilder.of(Money.class).setPrecision(128).set(RoundingMode.HALF_EVEN).build();
         MonetaryAmount m2 = m.getFactory().setContext(mc).create();
         assertNotNull(m2);
-        assertTrue(m != m2);
+        assertNotSame(m, m2);
         assertEquals(Money.DEFAULT_MONETARY_CONTEXT, m.getContext());
         assertEquals(mc, m2.getContext());
     }
@@ -1114,7 +1109,7 @@ public class MoneyTest {
     public void testFrom() {
         Money m = Money.of(new BigDecimal("1.2345"), "XXX");
         Money m2 = Money.from(m);
-        assertTrue(m == m2);
+        assertSame(m, m2);
     }
 
     @Test
@@ -1187,7 +1182,7 @@ public class MoneyTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRerturnErrorWhenUsingZeroTheCurrencyIsNull() {
     	Money.zero(null);
-    	Assert.fail();
+    	fail();
     }
 
     @Test
@@ -1200,7 +1195,7 @@ public class MoneyTest {
 	@Test(expectedExceptions = NullPointerException.class)
 	public void shouldRerturnErrorWhenUsingOfMinorTheCurrencyIsNull() {
 		Money.ofMinor(null, 1234L);
-		Assert.fail();
+		fail();
 	}
 
 	@Test

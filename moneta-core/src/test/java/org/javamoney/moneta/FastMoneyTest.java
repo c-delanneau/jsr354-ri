@@ -19,6 +19,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -40,7 +41,6 @@ import javax.money.MonetaryAmount;
 import javax.money.MonetaryOperator;
 import javax.money.MonetaryQuery;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -95,6 +95,14 @@ public class FastMoneyTest {
         FastMoney[] divideAndRemainder = money1.divideAndRemainder(new BigDecimal("0.50001"));
         assertEquals(divideAndRemainder[0].getNumber().numberValue(BigDecimal.class), new BigDecimal("1"));
         assertEquals(divideAndRemainder[1].getNumber().numberValue(BigDecimal.class), new BigDecimal("0.49999"));
+    }
+
+    @Test
+    public void testDivideAndRemainderArithmeticException() {
+      BigDecimal original = BigDecimal.ONE;
+      FastMoney money = FastMoney.of(original, "EUR");
+      BigDecimal divisor = new BigDecimal("0.333333");
+      assertThrows(ArithmeticException.class, () -> money.divideAndRemainder(divisor));
     }
 
     @Test
@@ -709,6 +717,16 @@ public class FastMoneyTest {
             }
         }
     }
+    
+
+    /**
+     * Test method for {@link org.javamoney.moneta.FastMoney#scaleByPowerOfTen(int)} .
+     */
+    @Test
+    public void testScaleByPowerOfTenArithmeticException() {
+        FastMoney money = FastMoney.of(BigDecimal.valueOf(16, 5), "CHF");
+        assertThrows(ArithmeticException.class, () -> money.scaleByPowerOfTen(-1));
+    }
 
     /**
      * Test method for {@link org.javamoney.moneta.FastMoney#isZero()}.
@@ -1147,10 +1165,10 @@ public class FastMoneyTest {
     public void testFrom() {
         FastMoney m = FastMoney.of(new BigDecimal("1.2345"), "XXX");
         FastMoney m2 = FastMoney.from(m);
-        assertTrue(m == m2);
+        assertSame(m, m2);
         Money fm = Money.of(new BigDecimal("1.2345"), "XXX");
         m2 = FastMoney.from(fm);
-        assertFalse(m == m2);
+        assertNotSame(m, m2);
         assertEquals(m, m2);
     }
 
@@ -1164,7 +1182,7 @@ public class FastMoneyTest {
         ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
         FastMoney m2 = (FastMoney) ois.readObject();
         assertEquals(m, m2);
-        assertTrue(m != m2);
+        assertNotSame(m, m2);
     }
 
     @Test
@@ -1206,7 +1224,7 @@ public class FastMoneyTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRerturnErrorWhenUsingZeroTheCurrencyIsNull() {
         FastMoney.zero(null);
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -1219,7 +1237,7 @@ public class FastMoneyTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRerturnErrorWhenUsingOfMinorTheCurrencyIsNull() {
         FastMoney.ofMinor(null, 1234L);
-        Assert.fail();
+        fail();
     }
 
     @Test
